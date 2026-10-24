@@ -1,6 +1,6 @@
 # Each experiment changes one thing from the one before it, so I can tell what each change is worth.
 # Any setting from citebank/config.py can be overridden here. auto_filter switches bank/year detection on or off.
-# multi_bank_split is off everywhere except hybrid_rerank_split, so that experiment shows what the split alone changes.
+# multi_bank_split is off up to hybrid_rerank_split, so that experiment shows what the split alone changes.
 
 experiments:
   # baseline 1: keyword search only, fixed-size chunks
@@ -60,10 +60,10 @@ experiments:
     multi_bank_split: true
     llm_backend: ollama
 
-  # same retrieval, hosted model instead of local, to compare answer quality and speed
+  # same retrieval as hybrid_rerank_split, hosted model instead of local, so the LLM is the only difference
   - name: hybrid_rerank_api
     chunk_strategy: structured
     retrieval_mode: hybrid
     use_reranker: true
-    multi_bank_split: false
+    multi_bank_split: true
     llm_backend: anthropic
