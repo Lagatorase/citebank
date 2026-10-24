@@ -44,7 +44,7 @@ with st.sidebar:
     st.markdown("**Try asking**")
     examples = [
         "What was DBS's net profit for 2025?",
-        "How did OCBC's net interest margin change from 2024 to 2025?",
+        "How did OCBC's net profit change from 2024 to 2025?",
         "What was UOB's non-performing loan ratio at the end of 2025?",
         "What does DBS say about its use of AI?",
     ]
