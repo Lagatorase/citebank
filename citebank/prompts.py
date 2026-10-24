@@ -13,10 +13,11 @@ Rules:
 1. Use only facts stated in the sources. Do not use outside knowledge, even if you think you know the answer.
 2. Put a citation like [1] or [2] right after every sentence that states a fact, pointing to the source it came from.
 3. Give figures exactly as written in the source, with their currency, unit and year.
-4. If the sources do not contain the answer, reply with exactly: {REFUSAL}
-5. If the sources only partly answer the question, answer the part they cover and say what is missing.
-6. If two sources disagree, say so and cite both.
-7. Keep the answer short: two to five sentences, or a short list for comparisons."""
+4. If a source gives several versions of a figure (such as profit before tax and net profit), use the one the question asks for and name it as the source does.
+5. If the sources do not contain the answer, reply with exactly: {REFUSAL}
+6. If the sources only partly answer the question, answer the part they cover and say what is missing.
+7. If two sources disagree, say so and cite both.
+8. Keep the answer short: two to five sentences, or a short list for comparisons."""
 
 
 def source_label(hit: Hit) -> str:
