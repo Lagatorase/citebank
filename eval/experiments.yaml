@@ -1,5 +1,6 @@
 # Each experiment changes one thing from the one before it, so I can tell what each change is worth.
 # Any setting from citebank/config.py can be overridden here. auto_filter switches bank/year detection on or off.
+# multi_bank_split is off everywhere except hybrid_rerank_split, so that experiment shows what the split alone changes.
 
 experiments:
   # baseline 1: keyword search only, fixed-size chunks
@@ -7,6 +8,7 @@ experiments:
     chunk_strategy: fixed
     retrieval_mode: bm25
     use_reranker: false
+    multi_bank_split: false
     llm_backend: ollama
 
   # baseline 2: vector search, same naive chunks
@@ -14,6 +16,7 @@ experiments:
     chunk_strategy: fixed
     retrieval_mode: dense
     use_reranker: false
+    multi_bank_split: false
     llm_backend: ollama
 
   # does layout-aware chunking (whole tables, headings kept) help?
@@ -21,6 +24,7 @@ experiments:
     chunk_strategy: structured
     retrieval_mode: dense
     use_reranker: false
+    multi_bank_split: false
     llm_backend: ollama
 
   # does combining keyword and vector search help?
@@ -28,6 +32,7 @@ experiments:
     chunk_strategy: structured
     retrieval_mode: hybrid
     use_reranker: false
+    multi_bank_split: false
     llm_backend: ollama
 
   # does a cross-encoder reranker help, and what does it cost in latency?
@@ -35,6 +40,7 @@ experiments:
     chunk_strategy: structured
     retrieval_mode: hybrid
     use_reranker: true
+    multi_bank_split: false
     llm_backend: ollama
 
   # how much does bank/year filtering contribute? (same as above with it switched off)
@@ -43,6 +49,15 @@ experiments:
     retrieval_mode: hybrid
     use_reranker: true
     auto_filter: false
+    multi_bank_split: false
+    llm_backend: ollama
+
+  # does searching each bank separately fix questions that compare banks?
+  - name: hybrid_rerank_split
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: true
+    multi_bank_split: true
     llm_backend: ollama
 
   # same retrieval, hosted model instead of local, to compare answer quality and speed
@@ -50,4 +65,5 @@ experiments:
     chunk_strategy: structured
     retrieval_mode: hybrid
     use_reranker: true
+    multi_bank_split: false
     llm_backend: anthropic

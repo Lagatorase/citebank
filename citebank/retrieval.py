@@ -99,17 +99,41 @@ class Retriever:
     def search(self, query: str, k: int | None = None, mode: str | None = None) -> list[Hit]:
         k = k or self.settings.top_k
         mode = mode or self.settings.retrieval_mode
-        # with a reranker I fetch a wider net first, then let the reranker pick the best k
-        pool = self.settings.candidate_k if self.reranker else k
 
         # if the question names a bank or year, I only search those reports
         allowed = None
         if self.auto_filter:
             banks, years = detect_filters(query, self.store)
+            # a question naming several banks gets one search per bank, so one bank can't fill the whole top k
+            if self.settings.multi_bank_split and len(banks) >= 2:
+                return self._split_search(query, k, mode, banks, years)
             allowed = self.store.metadata_mask(banks, years)
             # if the filter removes everything, I fall back to searching all reports instead of returning nothing
             if allowed is not None and not allowed.any():
                 allowed = None
+
+        return self._search(query, k, mode, allowed)
+
+    def _split_search(self, query: str, k: int, mode: str, banks: set[str], years: set[int]) -> list[Hit]:
+        # each bank gets an equal share of k, but never fewer than 2 results
+        share = max(2, -(-k // len(banks)))
+        per_bank = []
+        for bank in sorted(banks):
+            allowed = self.store.metadata_mask({bank}, years)
+            # a year this bank has no report for shouldn't drop the bank, so I retry with the bank alone
+            if not allowed.any():
+                allowed = self.store.metadata_mask({bank}, None)
+            # each bank's results are reranked on their own before I merge them
+            per_bank.append(self._search(query, share, mode, allowed))
+
+        # I take one result from each bank in turn, so every bank shows up near the top
+        merged = [hits[i] for i in range(share) for hits in per_bank if i < len(hits)]
+        # the total stays at k unless 2 per bank needs more than that
+        return merged[:max(k, 2 * len(banks))]
+
+    def _search(self, query: str, k: int, mode: str, allowed) -> list[Hit]:
+        # with a reranker I fetch a wider net first, then let the reranker pick the best k
+        pool = self.settings.candidate_k if self.reranker else k
 
         if mode == "dense":
             results = self.store.dense_search(self.embedder.embed_query(query), pool, allowed)

@@ -56,6 +56,8 @@ class Settings:
     top_k: int = field(default_factory=lambda: int(_env("TOP_K", "5")))
     # how many candidates I pull before reranking cuts them down to top_k
     candidate_k: int = field(default_factory=lambda: int(_env("CANDIDATE_K", "30")))
+    # when a question names two or more banks, search each bank separately and merge the results
+    multi_bank_split: bool = field(default_factory=lambda: _env_bool("MULTI_BANK_SPLIT", True))
 
     # chunking settings (size and overlap are in words)
     chunk_strategy: str = field(default_factory=lambda: _env("CHUNK_STRATEGY", "structured"))

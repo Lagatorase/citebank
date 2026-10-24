@@ -137,13 +137,13 @@ def write_report(experiments, summaries, all_rows, args, n_items) -> Path:
     lines = [f"# CiteBank evaluation report ({stamp})", "",
              f"Questions: {n_items} | page tolerance: {args.page_tolerance} | mode: {'retrieval only' if args.retrieval_only else 'full'}"
              + (f" | judge: {args.judge}" if args.judge else ""), ""]
-    lines += ["## Retrieval", "", "| Experiment | Chunking | Search | Rerank | Auto filter | Hit@k | MRR | Recall@k | Avg retrieval (ms) |",
-              "|---|---|---|---|---|---|---|---|---|"]
+    lines += ["## Retrieval", "", "| Experiment | Chunking | Search | Rerank | Auto filter | Bank split | Hit@k | MRR | Recall@k | Avg retrieval (ms) |",
+              "|---|---|---|---|---|---|---|---|---|---|"]
     base = get_settings()
     for exp, s in zip(experiments, summaries):
         st = base.with_overrides(**{k: v for k, v in exp.items() if k not in {"name", "auto_filter"}})
         lines.append(f"| {exp['name']} | {st.chunk_strategy} | {st.retrieval_mode} | {'yes' if st.use_reranker else 'no'} | "
-                     f"{'yes' if exp.get('auto_filter', True) else 'no'} | {_fmt(s['hit'])} | {_fmt(s['mrr'], False)} | "
+                     f"{'yes' if exp.get('auto_filter', True) else 'no'} | {'yes' if st.multi_bank_split else 'no'} | {_fmt(s['hit'])} | {_fmt(s['mrr'], False)} | "
                      f"{_fmt(s['recall'])} | {s['retrieval_s'] * 1000:.0f} |")
     if not args.retrieval_only:
         lines += ["", "## Answers", "", "| Experiment | LLM | Correct refusals | False refusals | Number match | Citation valid | Cites right page | Faithful | Correct | Avg generation (s) |",

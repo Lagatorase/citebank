@@ -1,5 +1,6 @@
 import importlib.util
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -40,5 +41,18 @@ def settings(sample_dir, tmp_path_factory):
 @pytest.fixture(scope="session")
 def store(docs):
     chunks = chunk_documents(docs, "structured", 220, 40)
+    embedder = HashEmbedder()
+    return VectorStore(chunks, embedder.embed_documents([c.text for c in chunks]), embedder.name)
+
+
+@pytest.fixture(scope="session")
+def two_bank_store(docs):
+    # the demo reports only have one bank, so I add a fictional second one (Acme) with the same pages but thin text,
+    # which lets Demo Bank fill the whole top k unless each bank is searched on its own
+    demo = chunk_documents(docs, "structured", 220, 40)
+    acme = [replace(c, id="acme_" + c.id, bank="ACME", source=f"acme_{c.year}.pdf",
+                    text=f"[ACME annual report {c.year} | page {c.page}]\nAcme Bank opened two new branches this year.")
+            for c in demo]
+    chunks = demo + acme
     embedder = HashEmbedder()
     return VectorStore(chunks, embedder.embed_documents([c.text for c in chunks]), embedder.name)
