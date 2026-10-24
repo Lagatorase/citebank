@@ -10,7 +10,7 @@ The main part of this project is the evaluation suite. Every retrieval choice (c
 
 ![Clicking a sidebar question, waiting for the answer, and reading the cited source](docs/demo.gif)
 
-*Asking a question from the sidebar and getting a cited answer (the wait for the answer is shortened).*
+*Asking a question from the sidebar and getting a cited answer, in real time (recorded after a warm-up question, so the models were already loaded).*
 
 ## What it does
 
