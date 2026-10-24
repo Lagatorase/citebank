@@ -35,10 +35,19 @@ def _mean(values):
     return statistics.mean(vals) if vals else None
 
 
-def run_experiment(exp: dict, items, base, caches, retrieval_only: bool, judge_llm, page_tolerance: int):
+def _settings_for(base, exp: dict):
     # each experiment is just a set of overrides on top of the .env settings
     overrides = {k: v for k, v in exp.items() if k not in {"name", "auto_filter"}}
-    settings = base.with_overrides(**overrides)
+    # folders come in from the yaml as text, so I resolve them against the project root like config.py does
+    for key in ("raw_dir", "index_dir"):
+        if key in overrides:
+            path = Path(overrides[key])
+            overrides[key] = path if path.is_absolute() else ROOT / path
+    return base.with_overrides(**overrides)
+
+
+def run_experiment(exp: dict, items, base, caches, retrieval_only: bool, judge_llm, page_tolerance: int):
+    settings = _settings_for(base, exp)
 
     # loading models is slow, so I cache embedders, rerankers and indexes across experiments
     embed_key = (settings.embed_backend, settings.local_embed_model, settings.openai_embed_model)
@@ -141,7 +150,7 @@ def write_report(experiments, summaries, all_rows, args, n_items) -> Path:
               "|---|---|---|---|---|---|---|---|---|---|"]
     base = get_settings()
     for exp, s in zip(experiments, summaries):
-        st = base.with_overrides(**{k: v for k, v in exp.items() if k not in {"name", "auto_filter"}})
+        st = _settings_for(base, exp)
         lines.append(f"| {exp['name']} | {st.chunk_strategy} | {st.retrieval_mode} | {'yes' if st.use_reranker else 'no'} | "
                      f"{'yes' if exp.get('auto_filter', True) else 'no'} | {'yes' if st.multi_bank_split else 'no'} | {_fmt(s['hit'])} | {_fmt(s['mrr'], False)} | "
                      f"{_fmt(s['recall'])} | {s['retrieval_s'] * 1000:.0f} |")
@@ -149,7 +158,7 @@ def write_report(experiments, summaries, all_rows, args, n_items) -> Path:
         lines += ["", "## Answers", "", "| Experiment | LLM | Correct refusals | False refusals | Number match | Citation valid | Cites right page | Faithful | Correct | Avg generation (s) |",
                   "|---|---|---|---|---|---|---|---|---|---|"]
         for exp, s in zip(experiments, summaries):
-            st = base.with_overrides(**{k: v for k, v in exp.items() if k not in {"name", "auto_filter"}})
+            st = _settings_for(base, exp)
             model = {"ollama": st.ollama_model, "openai": st.openai_model, "anthropic": st.anthropic_model}.get(st.llm_backend, st.llm_backend)
             lines.append(f"| {exp['name']} | {st.llm_backend}: {model} | {_fmt(s['correct_refusal'])} | {_fmt(s['false_refusal'])} | "
                          f"{_fmt(s['number_match'])} | {_fmt(s['citation_valid'])} | {_fmt(s['citation_hit'])} | "

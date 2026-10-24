@@ -197,8 +197,11 @@ docker compose up --build
 To check the whole eval pipeline offline with the demo reports and no model downloads:
 
 ```powershell
+python scripts/make_sample_report.py data/demo
 python -m eval.run_eval --questions eval/demo_questions.jsonl --config eval/demo_experiments.yaml
 ```
+
+The demo reports go in their own `data/demo` folder, so this works whether or not the real reports are in `data/raw`.
 
 ## Tests
 

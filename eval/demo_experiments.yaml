@@ -1,8 +1,12 @@
 # Offline experiments for the fictional demo reports. No model downloads or API keys needed,
 # so this checks the whole eval pipeline works before running the real experiments.yaml.
+# The demo reports live in their own folder (python scripts/make_sample_report.py data/demo), so the real
+# reports in data/raw are never parsed here and the demo indexes don't mix with the real ones.
 
 experiments:
   - name: demo_bm25_fixed
+    raw_dir: data/demo
+    index_dir: data/index/demo
     embed_backend: hash
     chunk_strategy: fixed
     retrieval_mode: bm25
@@ -11,6 +15,8 @@ experiments:
     top_k: 2
 
   - name: demo_dense_structured
+    raw_dir: data/demo
+    index_dir: data/index/demo
     embed_backend: hash
     chunk_strategy: structured
     retrieval_mode: dense
@@ -19,6 +25,8 @@ experiments:
     top_k: 2
 
   - name: demo_hybrid_structured
+    raw_dir: data/demo
+    index_dir: data/index/demo
     embed_backend: hash
     chunk_strategy: structured
     retrieval_mode: hybrid
@@ -27,6 +35,8 @@ experiments:
     top_k: 2
 
   - name: demo_hybrid_nofilter
+    raw_dir: data/demo
+    index_dir: data/index/demo
     embed_backend: hash
     chunk_strategy: structured
     retrieval_mode: hybrid

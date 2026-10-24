@@ -5,6 +5,7 @@ __pycache__/
 .venv/
 venv/
 data/raw/*.pdf
+data/demo/
 data/index/*
 !data/index/.gitkeep
 eval/results/*
