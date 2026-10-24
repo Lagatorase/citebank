@@ -252,3 +252,7 @@ tests/
 - Page numbers are PDF page numbers, which can differ from the numbers printed on the report pages.
 - The LLM judge is itself a model and can be wrong, which is why its reasoning is saved for every question.
 - The index is a NumPy array searched by brute force. That is fast enough for six reports, but a vector database like pgvector or Qdrant would be needed for thousands of documents.
+
+## Related project
+
+[Credit Risk Scorecard](https://github.com/Lagatorase/credit-risk-scorecard): explainable credit risk scoring on Home Credit data, with reason codes, fairness checks and LLM explanations.
