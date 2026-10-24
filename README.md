@@ -4,6 +4,8 @@ Ask questions about the DBS, OCBC and UOB annual reports and get short answers t
 
 The main part of this project is the evaluation suite. Every design choice (chunking, search method, reranking, local vs hosted LLM) is measured against a hand-checked question set, so I can show which choices actually improved results and by how much.
 
+![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/Screenshot%20citebank.png)
+
 ## What it does
 
 - Parses long annual report PDFs, keeping page numbers, section headings and financial tables (tables are converted to markdown so figures stay in their rows and columns)
@@ -81,7 +83,7 @@ Each answerable question records the bank, year and page where the answer is, ch
 
 ### Results
 
-21 hand-checked questions (15 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB). The hosted API experiment is not included yet.
+21 hand-checked questions (15 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB). The hosted API experiment is not included yet. The full report, including the retrieval misses, is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
 
 **Retrieval**
 
