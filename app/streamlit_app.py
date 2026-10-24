@@ -46,7 +46,7 @@ with st.sidebar:
         "What was DBS's net profit for 2025?",
         "How did OCBC's net profit change from 2024 to 2025?",
         "What was UOB's non-performing loan ratio at the end of 2025?",
-        "What does DBS say about its use of AI?",
+        "What was DBS's CET1 ratio at the end of 2025?",
     ]
     for ex in examples:
         if st.button(ex, use_container_width=True):
