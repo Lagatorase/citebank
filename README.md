@@ -1,5 +1,7 @@
 # CiteBank
 
+[![tests](https://github.com/Lagatorase/citebank/actions/workflows/tests.yml/badge.svg)](https://github.com/Lagatorase/citebank/actions/workflows/tests.yml)
+
 Ask questions about the DBS, OCBC and UOB annual reports and get short answers that cite the exact page they came from. If the reports don't contain the answer, it says so instead of guessing.
 
 The main part of this project is the evaluation suite. Every design choice (chunking, search method, reranking, local vs hosted LLM) is measured against a hand-checked question set, so I can show which choices actually improved results and by how much.
