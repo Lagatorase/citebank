@@ -8,6 +8,10 @@ The main part of this project is the evaluation suite. Every retrieval choice (c
 
 ![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/screenshot.png)
 
+![Clicking a sidebar question, waiting for the answer, and reading the cited source](docs/demo.gif)
+
+*Asking a question from the sidebar and getting a cited answer (the wait for the answer is shortened).*
+
 ## What it does
 
 - Parses long annual report PDFs, keeping page numbers, section headings and financial tables (tables are converted to markdown so figures stay in their rows and columns)
