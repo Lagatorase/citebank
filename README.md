@@ -51,7 +51,9 @@ flowchart LR
 
 **Refusals and citation checks.** The prompt requires a citation after every factual sentence and an exact refusal phrase when the sources don't cover the question. After generation, every `[n]` is checked against the sources the model was given. The eval set includes questions the reports can't answer, to measure whether the system refuses instead of making something up.
 
-**Local and hosted LLMs behind one interface.** Ollama runs a 7B model on my own GPU for free; a hosted API gives better answers at a small cost per question. Both sit behind the same `generate()` method, so the eval can compare them on identical retrieval.
+**Two-page spreads.** Some reports (DBS) put two printed pages side by side on one wide PDF page. When a page is more than 1.2 times as wide as it is tall, the parser reads the left and right halves separately, because PyMuPDF can otherwise merge lines from both halves into one block when they sit at the same height. Within each half I keep PyMuPDF's own block order instead of sorting blocks top to bottom, since that order follows multi-column layouts and sorting by height would interleave the columns. Each table is then placed just before the first text block below it in the same column, so headings stay ahead of their tables. Both halves keep the same PDF page number, so a citation points to the spread.
+
+**Local and hosted LLMs behind one interface.** Ollama runs `qwen2.5:3b` on my 6 GB laptop GPU for free; `qwen2.5:7b` is the option for GPUs with 8 GB or more. A hosted API gives better answers at a small cost per question. Both sit behind the same `generate()` method, so the eval can compare them on identical retrieval.
 
 ## Evaluation
 
@@ -83,7 +85,7 @@ Each answerable question records the bank, year and page where the answer is, ch
 
 ### Results
 
-21 hand-checked questions (15 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB). The hosted API experiment is not included yet. The full report, including the retrieval misses, is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
+21 hand-checked questions (15 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB). The hosted API experiment is not included yet. With 15 answerable questions each question is worth about 7 percentage points, so a one-question difference between experiments is within noise. The full report, including the retrieval misses, is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
 
 **Retrieval**
 
@@ -114,7 +116,7 @@ The reranker made the biggest difference: hybrid search with reranking had the b
 You need Python 3.11 or newer, an NVIDIA GPU with current drivers (optional, but embedding is much faster with it), and [Ollama](https://ollama.com) for the local LLM.
 
 ```powershell
-git clone <your repo url>
+git clone https://github.com/Lagatorase/citebank
 cd citebank
 python -m venv .venv
 .venv\Scripts\activate
