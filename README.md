@@ -4,7 +4,7 @@
 
 Ask questions about the DBS, OCBC and UOB annual reports and get short answers that cite the exact page they came from. If the reports don't contain the answer, it says so instead of guessing.
 
-The main part of this project is the evaluation suite. Every design choice (chunking, search method, reranking, local vs hosted LLM) is measured against a question set checked against the PDFs, so I can show which choices actually improved results and by how much.
+The main part of this project is the evaluation suite. Every retrieval choice (chunking, search method, reranking, bank and year filtering) is measured against a question set checked against the PDFs, so I can show which choices actually improved results and by how much.
 
 ![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/screenshot.png)
 
@@ -55,7 +55,7 @@ flowchart LR
 
 **Two-page spreads.** Some reports (DBS) put two printed pages side by side on one wide PDF page. When a page is more than 1.2 times as wide as it is tall, the parser reads the left and right halves separately, because PyMuPDF can otherwise merge lines from both halves into one block when they sit at the same height. Within each half I keep PyMuPDF's own block order instead of sorting blocks top to bottom, since that order follows multi-column layouts and sorting by height would interleave the columns. Each table is then placed just before the first text block below it in the same column, so headings stay ahead of their tables. Both halves keep the same PDF page number, so a citation points to the spread.
 
-**Local and hosted LLMs behind one interface.** Ollama runs `qwen2.5:3b` on my 6 GB laptop GPU for free; `qwen2.5:7b` is the option for GPUs with 8 GB or more. A hosted API gives better answers at a small cost per question. Both sit behind the same `generate()` method, so the eval can compare them on identical retrieval.
+**Local and hosted LLMs behind one interface.** Ollama runs `qwen2.5:3b` on my 6 GB laptop GPU for free; `qwen2.5:7b` is the option for GPUs with 8 GB or more. A hosted API should give better answers at a small cost per question. Both sit behind the same `generate()` method, so the eval can compare them on identical retrieval. That comparison (`hybrid_rerank_api`) is set up but hasn't been run yet.
 
 ## Evaluation
 
@@ -83,21 +83,29 @@ Each answerable question records the bank, year and every page where the answer 
 - Cites right page: the answer cites at least one correct evidence page
 - Faithful and Correct (optional): graded by an LLM judge, with its reasoning saved per question so I can spot-check it
 
-**Experiments** (`eval/experiments.yaml`) change one thing at a time: BM25 baseline, dense search, structured chunking, hybrid search, reranking, bank/year filtering switched off, searching each bank separately for questions that name several banks, and finally the hosted LLM instead of the local one.
+**Experiments** (`eval/experiments.yaml`) change one thing at a time: BM25 baseline, dense search, structured chunking, hybrid search, reranking, bank/year filtering switched off, searching each bank separately for questions that name several banks, and finally the hosted LLM instead of the local one (set up, not yet run).
 
 ### Results
 
-32 questions (26 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB). The hosted API experiment is not included yet. With 26 answerable questions each question is worth about 4 percentage points, so a one-question difference between experiments is within noise. The full report, including the retrieval misses, is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
+32 questions (26 answerable, 6 unanswerable) over the six FY2024 and FY2025 reports, top 5 sources, answers from `qwen2.5:3b` running locally in Ollama on an RTX 4050 laptop GPU (6 GB).
+
+**Key findings**
+
+- Reranking was the biggest retrieval gain: adding the cross-encoder to hybrid search raised MRR from 0.69 to 0.82 and Hit@5 from 88% to 96%, at a cost of about half a second per question (40 ms to 495 ms).
+- BM25 alone was a strong baseline: 96% Hit@5 and 0.80 MRR in 10 ms, and it refused all six unanswerable questions. Dense search on fixed-size chunks was the weakest setup (77% Hit@5, 0.60 MRR).
+- Searching each bank separately fixed retrieval for the cross-bank question: its sources went from four OCBC pages and one UOB page to two pages per bank, lifting Hit@5 to 100% and MRR to 0.86. The answer still quotes DBS's profit before tax (SGD 13.1 billion) instead of its net profit (SGD 11.0 billion).
+- The remaining errors come from the 3b model, not retrieval: with the bank split every answerable question had an evidence page in the top 5, yet it refused 2 of 26 answerable questions, matched 78% of reference figures and recommended a credit card instead of refusing.
+- The hosted model comparison (`hybrid_rerank_api`) is set up with the same retrieval as `hybrid_rerank_split` but hasn't been run yet.
 
 **Retrieval**
 
 | Experiment | Chunking | Search | Rerank | Auto filter | Bank split | Hit@k | MRR | Recall@k | Avg retrieval (ms) |
 |---|---|---|---|---|---|---|---|---|---|
-| bm25_fixed | fixed | bm25 | no | yes | no | 96% | 0.80 | 79% | 11 |
-| dense_fixed | fixed | dense | no | yes | no | 77% | 0.60 | 57% | 37 |
-| dense_structured | structured | dense | no | yes | no | 92% | 0.67 | 66% | 16 |
-| hybrid_structured | structured | hybrid | no | yes | no | 88% | 0.69 | 69% | 29 |
-| hybrid_rerank | structured | hybrid | yes | yes | no | 96% | 0.82 | 79% | 491 |
+| bm25_fixed | fixed | bm25 | no | yes | no | 96% | 0.80 | 79% | 10 |
+| dense_fixed | fixed | dense | no | yes | no | 77% | 0.60 | 57% | 32 |
+| dense_structured | structured | dense | no | yes | no | 92% | 0.67 | 66% | 19 |
+| hybrid_structured | structured | hybrid | no | yes | no | 88% | 0.69 | 69% | 40 |
+| hybrid_rerank | structured | hybrid | yes | yes | no | 96% | 0.82 | 79% | 495 |
 | hybrid_rerank_nofilter | structured | hybrid | yes | no | no | 96% | 0.78 | 78% | 478 |
 | hybrid_rerank_split | structured | hybrid | yes | yes | yes | 100% | 0.86 | 80% | 517 |
 
@@ -105,29 +113,15 @@ Each answerable question records the bank, year and every page where the answer 
 
 | Experiment | LLM | Correct refusals | False refusals | Number match | Citation valid | Cites right page | Avg generation (s) |
 |---|---|---|---|---|---|---|---|
-| bm25_fixed | ollama: qwen2.5:3b | 100% | 15% | 60% | 100% | 69% | 0.98 |
-| dense_fixed | ollama: qwen2.5:3b | 100% | 19% | 60% | 100% | 58% | 1.09 |
-| dense_structured | ollama: qwen2.5:3b | 100% | 19% | 58% | 100% | 62% | 0.86 |
-| hybrid_structured | ollama: qwen2.5:3b | 83% | 12% | 63% | 100% | 69% | 0.80 |
-| hybrid_rerank | ollama: qwen2.5:3b | 83% | 8% | 78% | 100% | 81% | 0.82 |
-| hybrid_rerank_nofilter | ollama: qwen2.5:3b | 83% | 8% | 73% | 100% | 73% | 0.71 |
-| hybrid_rerank_split | ollama: qwen2.5:3b | 83% | 4% | 78% | 100% | 85% | 0.69 |
+| bm25_fixed | ollama: qwen2.5:3b | 100% | 12% | 70% | 100% | 73% | 1.04 |
+| dense_fixed | ollama: qwen2.5:3b | 100% | 19% | 62% | 100% | 62% | 1.08 |
+| dense_structured | ollama: qwen2.5:3b | 83% | 23% | 58% | 100% | 58% | 0.85 |
+| hybrid_structured | ollama: qwen2.5:3b | 83% | 8% | 73% | 100% | 73% | 0.82 |
+| hybrid_rerank | ollama: qwen2.5:3b | 83% | 8% | 81% | 100% | 73% | 0.82 |
+| hybrid_rerank_nofilter | ollama: qwen2.5:3b | 83% | 4% | 73% | 100% | 65% | 0.82 |
+| hybrid_rerank_split | ollama: qwen2.5:3b | 83% | 8% | 78% | 100% | 77% | 0.69 |
 
-**Hand-written vs drafted questions** (answerable only)
-
-| Experiment | Hand-written (15): MRR | Number match | Cites right page | Drafted (11): MRR | Number match | Cites right page |
-|---|---|---|---|---|---|---|
-| bm25_fixed | 0.70 | 58% | 73% | 0.94 | 64% | 64% |
-| dense_fixed | 0.54 | 50% | 47% | 0.68 | 73% | 73% |
-| dense_structured | 0.60 | 46% | 47% | 0.76 | 73% | 82% |
-| hybrid_structured | 0.62 | 55% | 60% | 0.79 | 73% | 82% |
-| hybrid_rerank | 0.72 | 68% | 73% | 0.95 | 91% | 91% |
-| hybrid_rerank_nofilter | 0.65 | 67% | 67% | 0.95 | 82% | 82% |
-| hybrid_rerank_split | 0.78 | 68% | 80% | 0.95 | 91% | 91% |
-
-The drafted questions are easier than the hand-written ones: each comes from a single passage and tends to reuse its wording, so retrieval finds the page more often (MRR 0.95 against 0.72 with reranking). The scores on the 15 hand-written questions are identical to the run before the drafted ones were added, so the overall rise comes from the easier questions and not from any change to the system. Hybrid search with reranking has the best MRR on both sets, but the drafted questions barely separate the reranked experiments (all three score 0.95), so the hand-written ones are the better guide to which choices matter.
-
-The reranker made the biggest difference among the general changes: hybrid search with reranking had the best number match (78%) and, without the bank split, the best MRR (0.82), for about half a second of extra retrieval time per question, and switching off bank and year filtering cost it 0.04 MRR and 5 points of number match. Plain BM25 was a surprisingly strong baseline, tying on Hit@5 (96%) and refusing all six unanswerable questions, while dense search alone was the weakest at finding the exact page. Searching each bank separately (`hybrid_rerank_split`) only changes questions that name two or more banks, which is just the one cross-bank comparison question here, so all of its gains over `hybrid_rerank` come from that question. Without the split, its five sources were four OCBC pages and one UOB page and the model refused; with it, the sources were two pages from each of DBS, OCBC and UOB, the top one was DBS page 9 (an evidence page), and the model named DBS as the highest and cited that page. That is what lifts Hit@5 to 100%, MRR to 0.86, citing the right page to 85% and lowers false refusals to 4%. The answer still quoted DBS's profit before tax (SGD 13.1 billion) instead of its net profit (SGD 11.0 billion), which sits in the same paragraph, and no OCBC or UOB evidence page was retrieved, so recall for that question is only one of four pages. Most remaining failures come from the small local model rather than retrieval: it refused the OCBC net interest margin question even though the right page was retrieved, recommended a credit card it should have refused, and answered the DBS retention award question with only a citation marker (`[1]`) and no text.
+With 26 answerable questions each question is worth about 4 percentage points, so a one-question difference between experiments is noise. The full analysis (hand-written vs drafted questions, what the bank split changed, and the remaining failures) is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
 
 ## Setup (Windows)
 
@@ -248,7 +242,8 @@ tests/
 
 ## Limitations and next steps
 
-- Comparison questions across banks now get sources from every bank named (`MULTI_BANK_SPLIT`), but each bank's search still uses the whole question, so it can pick a page with a related figure (like profit before tax) over the one with the figure asked about. Rewriting the question into one sub-question per bank before searching would make each search more specific.
+- Comparison questions across banks now get sources from every bank named (`MULTI_BANK_SPLIT`), but the 3b model can still take the wrong figure from a page that states several: it quotes DBS's profit before tax as its net profit, even with a prompt rule against it. Each bank's search also still uses the whole question; rewriting it into one sub-question per bank would make each search more specific.
+- When the model replies with only a citation marker, the pipeline retries once and then refuses. That hides the empty answer but doesn't answer the question: the DBS retention award question is now refused in both reranked experiments.
 - Charts and infographics are images, so figures that only appear in a chart are invisible to the parser.
 - Page numbers are PDF page numbers, which can differ from the numbers printed on the report pages.
 - The LLM judge is itself a model and can be wrong, which is why its reasoning is saved for every question.
