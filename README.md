@@ -4,7 +4,7 @@ Ask questions about the DBS, OCBC and UOB annual reports and get short answers t
 
 The main part of this project is the evaluation suite. Every design choice (chunking, search method, reranking, local vs hosted LLM) is measured against a hand-checked question set, so I can show which choices actually improved results and by how much.
 
-![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/Screenshot%20citebank.png)
+![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/screenshot.png)
 
 ## What it does
 
