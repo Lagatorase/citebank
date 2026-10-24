@@ -52,7 +52,7 @@ with st.sidebar:
         if st.button(ex, use_container_width=True):
             st.session_state["question"] = ex
 
-question = st.text_input("Your question", key="question", placeholder="e.g. What was DBS's CET1 ratio in 2025?")
+question = st.text_input("Your question", key="question", placeholder="e.g. What was UOB's total income in 2024?")
 
 if question:
     with st.spinner("Searching the reports..."):
