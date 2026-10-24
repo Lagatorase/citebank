@@ -1,0 +1,53 @@
+# Each experiment changes one thing from the one before it, so I can tell what each change is worth.
+# Any setting from banklens/config.py can be overridden here. auto_filter switches bank/year detection on or off.
+
+experiments:
+  # baseline 1: keyword search only, fixed-size chunks
+  - name: bm25_fixed
+    chunk_strategy: fixed
+    retrieval_mode: bm25
+    use_reranker: false
+    llm_backend: ollama
+
+  # baseline 2: vector search, same naive chunks
+  - name: dense_fixed
+    chunk_strategy: fixed
+    retrieval_mode: dense
+    use_reranker: false
+    llm_backend: ollama
+
+  # does layout-aware chunking (whole tables, headings kept) help?
+  - name: dense_structured
+    chunk_strategy: structured
+    retrieval_mode: dense
+    use_reranker: false
+    llm_backend: ollama
+
+  # does combining keyword and vector search help?
+  - name: hybrid_structured
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: false
+    llm_backend: ollama
+
+  # does a cross-encoder reranker help, and what does it cost in latency?
+  - name: hybrid_rerank
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: true
+    llm_backend: ollama
+
+  # how much does bank/year filtering contribute? (same as above with it switched off)
+  - name: hybrid_rerank_nofilter
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: true
+    auto_filter: false
+    llm_backend: ollama
+
+  # same retrieval, hosted model instead of local, to compare answer quality and speed
+  - name: hybrid_rerank_api
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: true
+    llm_backend: anthropic

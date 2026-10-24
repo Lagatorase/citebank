@@ -1,0 +1,10 @@
+// Questions about the fictional Demo Bank reports made by scripts/make_sample_report.py. All figures are made up.
+{"id": "demo-2025-profit", "question": "What was Demo Bank's net profit in 2025?", "type": "numeric", "answer": "SGD 4.57 billion", "evidence": [{"bank": "DEMO", "year": 2025, "page": 1}, {"bank": "DEMO", "year": 2025, "page": 2}], "verified": true}
+{"id": "demo-2024-cet1", "question": "What was the CET1 ratio of Demo Bank in 2024?", "type": "numeric", "answer": "14.2%", "evidence": [{"bank": "DEMO", "year": 2024, "page": 2}], "verified": true}
+{"id": "demo-2025-staff", "question": "How many employees did Demo Bank have at the end of 2025?", "type": "numeric", "answer": "19,050 employees", "evidence": [{"bank": "DEMO", "year": 2025, "page": 5}], "verified": true}
+{"id": "demo-2024-green", "question": "How much sustainable financing had Demo Bank committed by the end of 2024?", "type": "numeric", "answer": "SGD 21 billion", "evidence": [{"bank": "DEMO", "year": 2024, "page": 4}], "verified": true}
+{"id": "demo-2025-dividend", "question": "What dividend per share did Demo Bank propose for 2025?", "type": "numeric", "answer": "SGD 1.85 per share", "evidence": [{"bank": "DEMO", "year": 2025, "page": 1}], "verified": true}
+{"id": "demo-credit-risk", "question": "How does Demo Bank manage credit risk?", "type": "factual", "answer": "Through borrower limits, sector concentration limits and regular stress testing.", "evidence": [{"bank": "DEMO", "year": 2025, "page": 3}, {"bank": "DEMO", "year": 2024, "page": 3}], "verified": true}
+{"id": "demo-nim-change", "question": "How did Demo Bank's NIM change from 2024 to 2025?", "type": "comparison", "answer": "It rose from 2.05% in 2024 to 2.11% in 2025.", "evidence": [{"bank": "DEMO", "year": 2025, "page": 2}], "verified": true}
+{"id": "demo-unanswerable-ceo", "question": "Who is the chief executive of Demo Bank?", "type": "unanswerable", "verified": true}
+{"id": "demo-unanswerable-2030", "question": "What will Demo Bank's net profit be in 2030?", "type": "unanswerable", "verified": true}

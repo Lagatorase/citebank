@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+data/raw/*.pdf
+data/index/*
+!data/index/.gitkeep
+eval/results/*
+!eval/results/.gitkeep
+!eval/results/sample_report.md

@@ -1,0 +1,36 @@
+# Offline experiments for the fictional demo reports. No model downloads or API keys needed,
+# so this checks the whole eval pipeline works before running the real experiments.yaml.
+
+experiments:
+  - name: demo_bm25_fixed
+    embed_backend: hash
+    chunk_strategy: fixed
+    retrieval_mode: bm25
+    use_reranker: false
+    llm_backend: echo
+    top_k: 2
+
+  - name: demo_dense_structured
+    embed_backend: hash
+    chunk_strategy: structured
+    retrieval_mode: dense
+    use_reranker: false
+    llm_backend: echo
+    top_k: 2
+
+  - name: demo_hybrid_structured
+    embed_backend: hash
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: false
+    llm_backend: echo
+    top_k: 2
+
+  - name: demo_hybrid_nofilter
+    embed_backend: hash
+    chunk_strategy: structured
+    retrieval_mode: hybrid
+    use_reranker: false
+    auto_filter: false
+    llm_backend: echo
+    top_k: 2
