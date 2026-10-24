@@ -38,6 +38,8 @@ class Answer:
     model: str = ""
     retrieval_s: float = 0.0
     generation_s: float = 0.0
+    # true when the first reply was empty (or only citation markers) and I asked the model again
+    retried: bool = False
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -47,6 +49,11 @@ def is_refusal(text: str) -> bool:
     # I match on the key part of the phrase, since models sometimes add a sentence around it
     # small models also reword the end, e.g. "in the provided annual reports", so I allow that too
     return bool(re.search(r"could not find this in the (provided )?annual reports", text.lower()))
+
+
+def is_empty_answer(text: str) -> bool:
+    # small models sometimes reply with just "[1]" or nothing at all, which isn't an answer
+    return not CITATION_RE.sub("", text).strip(" \t\n.,;:")
 
 
 def parse_citations(text: str, hits: list[Hit]) -> tuple[list[Citation], list[int]]:
@@ -87,8 +94,22 @@ class RAGPipeline:
         if not hits:
             return Answer(question, REFUSAL, True, sources=sources, model=self.llm.name, retrieval_s=retrieval_s)
 
-        result = self.llm.generate(SYSTEM_PROMPT, build_user_prompt(question, hits))
+        prompt = build_user_prompt(question, hits)
+        result = self.llm.generate(SYSTEM_PROMPT, prompt)
         text = result.text.strip()
+        generation_s = result.latency_s
+
+        # an empty reply gets one more try; I raise the temperature a little, since at 0 the model would repeat itself
+        retried = False
+        if is_empty_answer(text):
+            retried = True
+            result = self.llm.generate(SYSTEM_PROMPT, prompt, temperature=0.3)
+            text = result.text.strip()
+            generation_s += result.latency_s
+            # if it's still empty I refuse rather than show a bare citation marker
+            if is_empty_answer(text):
+                text = REFUSAL
+
         citations, invalid = parse_citations(text, hits)
         return Answer(question, text, is_refusal(text), citations, invalid, sources, result.model,
-                      retrieval_s, result.latency_s)
+                      retrieval_s, generation_s, retried)

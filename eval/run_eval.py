@@ -80,7 +80,7 @@ def run_experiment(exp: dict, items, base, caches, retrieval_only: bool, judge_l
             chunks = [h.chunk for h in hits]
         else:
             ans = rag.ask(item.question)
-            row.update({"answer": ans.answer, "refused": ans.refused, "retrieval_s": ans.retrieval_s,
+            row.update({"answer": ans.answer, "refused": ans.refused, "retried": ans.retried, "retrieval_s": ans.retrieval_s,
                         "generation_s": ans.generation_s, "invalid_citations": ans.invalid_citations,
                         "cited_pages": [(c.bank, c.year, c.page) for c in ans.citations]})
             # the answer already lists what was retrieved, so I score that instead of searching again

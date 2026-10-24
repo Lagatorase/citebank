@@ -1,7 +1,7 @@
 from citebank.chunking import Chunk
 from citebank.embeddings import HashEmbedder
-from citebank.llm import EchoLLM
-from citebank.pipeline import RAGPipeline, is_refusal, parse_citations
+from citebank.llm import EchoLLM, LLMResult
+from citebank.pipeline import RAGPipeline, is_empty_answer, is_refusal, parse_citations
 from citebank.prompts import REFUSAL
 from citebank.retrieval import Hit, Retriever, detect_filters, expand_acronyms, reciprocal_rank_fusion
 from citebank.store import VectorStore, tokenize
@@ -84,3 +84,46 @@ def test_pipeline_refuses_without_sources(settings):
     rag = RAGPipeline(settings, embedder=HashEmbedder(), llm=EchoLLM(), store=empty)
     ans = rag.ask("anything at all")
     assert ans.refused and ans.answer == REFUSAL
+
+
+class ScriptedLLM:
+    # stands in for a model that gives the replies I script, in order, and repeats the last one after that
+    name = "scripted"
+
+    def __init__(self, *replies):
+        self.replies = list(replies)
+        self.calls = 0
+
+    def generate(self, system, user, temperature=0.0, max_tokens=700):
+        reply = self.replies[min(self.calls, len(self.replies) - 1)]
+        self.calls += 1
+        return LLMResult(reply, self.name, 0.1)
+
+
+def test_is_empty_answer():
+    assert is_empty_answer("") and is_empty_answer("[1]") and is_empty_answer(" [1][2]. ")
+    assert not is_empty_answer("Net profit was SGD 4.57 billion [1].")
+
+
+def test_empty_answer_is_retried_once(settings, store):
+    llm = ScriptedLLM("[1]", "Net profit was SGD 4.57 billion [1].")
+    rag = RAGPipeline(settings, embedder=HashEmbedder(), llm=llm, store=store)
+    ans = rag.ask("What was Demo Bank's net profit in 2025?")
+    assert llm.calls == 2 and ans.retried and not ans.refused
+    assert ans.answer == "Net profit was SGD 4.57 billion [1]." and ans.citations
+    # both calls count towards the generation time
+    assert abs(ans.generation_s - 0.2) < 1e-9
+
+
+def test_answer_that_stays_empty_becomes_a_refusal(settings, store):
+    llm = ScriptedLLM("[1]")
+    rag = RAGPipeline(settings, embedder=HashEmbedder(), llm=llm, store=store)
+    ans = rag.ask("What was Demo Bank's net profit in 2025?")
+    assert llm.calls == 2 and ans.retried
+    assert ans.answer == REFUSAL and ans.refused and not ans.citations
+
+
+def test_normal_answer_is_not_retried(settings, store):
+    llm = ScriptedLLM("Net profit was SGD 4.57 billion [1].")
+    ans = RAGPipeline(settings, embedder=HashEmbedder(), llm=llm, store=store).ask("What was Demo Bank's net profit in 2025?")
+    assert llm.calls == 1 and not ans.retried
