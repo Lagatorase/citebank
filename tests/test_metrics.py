@@ -1,6 +1,6 @@
 import json
 
-from banklens.chunking import Chunk
+from citebank.chunking import Chunk
 from eval.metrics import load_items, number_match, retrieval_scores
 
 
@@ -38,7 +38,7 @@ def test_load_items_skips_comments_and_unverified(tmp_path):
 
 
 def test_shipped_question_files_parse():
-    from banklens.config import ROOT
+    from citebank.config import ROOT
 
     assert len(load_items(ROOT / "eval" / "demo_questions.jsonl")) == 9
     real = load_items(ROOT / "eval" / "questions.jsonl", include_unverified=True)

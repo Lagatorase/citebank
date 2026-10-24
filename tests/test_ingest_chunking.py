@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from banklens.chunking import _split_table, chunk_documents
-from banklens.ingest import parse_filename
+from citebank.chunking import _split_table, chunk_documents
+from citebank.ingest import parse_filename
 
 
 def test_parse_filename():
@@ -83,7 +83,7 @@ def test_spread_page_reads_left_half_first(tmp_path):
     # a wide page with two printed pages side by side should not interleave their lines
     import pymupdf
 
-    from banklens.ingest import load_pdf
+    from citebank.ingest import load_pdf
 
     doc = pymupdf.open()
     page = doc.new_page(width=1200, height=800)

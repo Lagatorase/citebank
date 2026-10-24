@@ -1,8 +1,8 @@
 """Command line entry point.
 
-  python -m banklens.cli build              parse the PDFs in data/raw and build the index
-  python -m banklens.cli ask "question"     answer one question with citations
-  python -m banklens.cli search "question"  show the retrieved chunks only, without calling the LLM
+  python -m citebank.cli build              parse the PDFs in data/raw and build the index
+  python -m citebank.cli ask "question"     answer one question with citations
+  python -m citebank.cli search "question"  show the retrieved chunks only, without calling the LLM
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ def _settings_from_args(args):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(prog="banklens")
+    parser = argparse.ArgumentParser(prog="citebank")
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add_common(p):

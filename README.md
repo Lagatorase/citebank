@@ -1,4 +1,4 @@
-# BankLens
+# CiteBank
 
 Ask questions about the DBS, OCBC and UOB annual reports and get short answers that cite the exact page they came from. If the reports don't contain the answer, it says so instead of guessing.
 
@@ -113,7 +113,7 @@ You need Python 3.11 or newer, an NVIDIA GPU with current drivers (optional, but
 
 ```powershell
 git clone <your repo url>
-cd banklens
+cd citebank
 python -m venv .venv
 .venv\Scripts\activate
 
@@ -151,10 +151,10 @@ Delete `data/raw/demo_*.pdf` once the real reports are in.
 ### Build and ask
 
 ```powershell
-python -m banklens.cli build
-python -m banklens.cli ask "What was DBS's net profit for 2025?"
-python -m banklens.cli search "OCBC CET1 ratio 2025"        # retrieval only, no LLM call
-python -m banklens.cli ask "What was UOB's NPL ratio in 2025?" --llm anthropic
+python -m citebank.cli build
+python -m citebank.cli ask "What was DBS's net profit for 2025?"
+python -m citebank.cli search "OCBC CET1 ratio 2025"        # retrieval only, no LLM call
+python -m citebank.cli ask "What was UOB's NPL ratio in 2025?" --llm anthropic
 ```
 
 The first build downloads the embedding model and parses every page, so it takes a few minutes for six reports. Later runs load the saved index.
@@ -203,7 +203,7 @@ The tests build the fictional demo reports and use a hashing embedder and a stub
 ## Project structure
 
 ```
-banklens/
+citebank/
   config.py        settings from .env
   ingest.py        PDF parsing: pages, headings, tables, header/footer removal
   chunking.py      fixed and structured chunking

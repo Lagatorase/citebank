@@ -7,11 +7,11 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from banklens.chunking import chunk_documents  # noqa: E402
-from banklens.config import Settings  # noqa: E402
-from banklens.embeddings import HashEmbedder  # noqa: E402
-from banklens.ingest import load_folder  # noqa: E402
-from banklens.store import VectorStore  # noqa: E402
+from citebank.chunking import chunk_documents  # noqa: E402
+from citebank.config import Settings  # noqa: E402
+from citebank.embeddings import HashEmbedder  # noqa: E402
+from citebank.ingest import load_folder  # noqa: E402
+from citebank.store import VectorStore  # noqa: E402
 
 
 @pytest.fixture(scope="session")

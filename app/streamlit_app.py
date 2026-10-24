@@ -12,20 +12,20 @@ from pathlib import Path
 import httpx
 import streamlit as st
 
-# makes "import banklens" work when streamlit runs this file directly
+# makes "import citebank" work when streamlit runs this file directly
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 API_URL = os.getenv("API_URL", "").rstrip("/")
 
-st.set_page_config(page_title="BankLens", page_icon=":bank:", layout="wide")
-st.title("BankLens")
+st.set_page_config(page_title="CiteBank", page_icon=":bank:", layout="wide")
+st.title("CiteBank")
 st.caption("Ask questions about DBS, OCBC and UOB annual reports. Every answer cites the page it came from.")
 
 
 @st.cache_resource(show_spinner="Loading models and index...")
 def local_pipeline():
     # cached so the models load once per session, not on every question
-    from banklens.pipeline import RAGPipeline
+    from citebank.pipeline import RAGPipeline
 
     return RAGPipeline()
 

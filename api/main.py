@@ -10,8 +10,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from banklens.config import get_settings
-from banklens.pipeline import RAGPipeline
+from citebank.config import get_settings
+from citebank.pipeline import RAGPipeline
 
 # the pipeline holds the models in memory, so I create it once when the server starts
 state: dict = {}
@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     state.clear()
 
 
-app = FastAPI(title="BankLens", description="Cited answers from DBS, OCBC and UOB annual reports", lifespan=lifespan)
+app = FastAPI(title="CiteBank", description="Cited answers from DBS, OCBC and UOB annual reports", lifespan=lifespan)
 
 
 class AskRequest(BaseModel):

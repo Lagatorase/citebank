@@ -6,8 +6,8 @@ import json
 import re
 from dataclasses import dataclass, field
 
-from banklens.chunking import Chunk
-from banklens.llm import LLM
+from citebank.chunking import Chunk
+from citebank.llm import LLM
 
 
 @dataclass

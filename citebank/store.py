@@ -50,7 +50,7 @@ class VectorStore:
     @classmethod
     def load(cls, folder: Path) -> "VectorStore":
         if not (folder / "chunks.jsonl").exists():
-            raise FileNotFoundError(f"No index at {folder}. Run: python -m banklens.cli build")
+            raise FileNotFoundError(f"No index at {folder}. Run: python -m citebank.cli build")
         with open(folder / "chunks.jsonl", encoding="utf-8") as f:
             chunks = [Chunk(**json.loads(line)) for line in f if line.strip()]
         vectors = np.load(folder / "vectors.npy")

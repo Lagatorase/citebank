@@ -1,10 +1,10 @@
-from banklens.chunking import Chunk
-from banklens.embeddings import HashEmbedder
-from banklens.llm import EchoLLM
-from banklens.pipeline import RAGPipeline, is_refusal, parse_citations
-from banklens.prompts import REFUSAL
-from banklens.retrieval import Hit, Retriever, detect_filters, expand_acronyms, reciprocal_rank_fusion
-from banklens.store import VectorStore, tokenize
+from citebank.chunking import Chunk
+from citebank.embeddings import HashEmbedder
+from citebank.llm import EchoLLM
+from citebank.pipeline import RAGPipeline, is_refusal, parse_citations
+from citebank.prompts import REFUSAL
+from citebank.retrieval import Hit, Retriever, detect_filters, expand_acronyms, reciprocal_rank_fusion
+from citebank.store import VectorStore, tokenize
 
 
 def test_tokenize_keeps_figures():

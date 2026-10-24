@@ -1,5 +1,5 @@
 # Each experiment changes one thing from the one before it, so I can tell what each change is worth.
-# Any setting from banklens/config.py can be overridden here. auto_filter switches bank/year detection on or off.
+# Any setting from citebank/config.py can be overridden here. auto_filter switches bank/year detection on or off.
 
 experiments:
   # baseline 1: keyword search only, fixed-size chunks

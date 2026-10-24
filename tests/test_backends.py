@@ -7,10 +7,10 @@ import types
 import httpx
 import numpy as np
 
-from banklens.chunking import Chunk
-from banklens.embeddings import BGE_QUERY_PREFIX, LocalEmbedder, OpenAIEmbedder
-from banklens.llm import AnthropicLLM, OllamaLLM, OpenAILLM
-from banklens.retrieval import Hit, Reranker
+from citebank.chunking import Chunk
+from citebank.embeddings import BGE_QUERY_PREFIX, LocalEmbedder, OpenAIEmbedder
+from citebank.llm import AnthropicLLM, OllamaLLM, OpenAILLM
+from citebank.retrieval import Hit, Reranker
 
 
 def _client(base_url, handler, headers=None):

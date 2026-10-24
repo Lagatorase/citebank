@@ -17,12 +17,12 @@ from pathlib import Path
 
 import yaml
 
-from banklens.config import ROOT, get_settings
-from banklens.embeddings import get_embedder
-from banklens.indexer import load_or_build
-from banklens.llm import get_llm
-from banklens.pipeline import RAGPipeline
-from banklens.retrieval import Reranker
+from citebank.config import ROOT, get_settings
+from citebank.embeddings import get_embedder
+from citebank.indexer import load_or_build
+from citebank.llm import get_llm
+from citebank.pipeline import RAGPipeline
+from citebank.retrieval import Reranker
 
 from .metrics import judge, load_items, number_match, retrieval_scores
 
@@ -134,7 +134,7 @@ def write_report(experiments, summaries, all_rows, args, n_items) -> Path:
         for r in all_rows:
             f.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
 
-    lines = [f"# BankLens evaluation report ({stamp})", "",
+    lines = [f"# CiteBank evaluation report ({stamp})", "",
              f"Questions: {n_items} | page tolerance: {args.page_tolerance} | mode: {'retrieval only' if args.retrieval_only else 'full'}"
              + (f" | judge: {args.judge}" if args.judge else ""), ""]
     lines += ["## Retrieval", "", "| Experiment | Chunking | Search | Rerank | Auto filter | Hit@k | MRR | Recall@k | Avg retrieval (ms) |",

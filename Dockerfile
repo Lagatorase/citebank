@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY banklens ./banklens
+COPY citebank ./citebank
 COPY api ./api
 COPY app ./app
 COPY eval ./eval

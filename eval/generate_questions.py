@@ -14,10 +14,10 @@ import json
 import random
 import re
 
-from banklens.config import ROOT, get_settings
-from banklens.embeddings import get_embedder
-from banklens.indexer import load_or_build
-from banklens.llm import get_llm
+from citebank.config import ROOT, get_settings
+from citebank.embeddings import get_embedder
+from citebank.indexer import load_or_build
+from citebank.llm import get_llm
 
 PROMPT = """Below is an excerpt from the {bank} annual report for {year}, page {page}.
 
