@@ -93,27 +93,27 @@ Each answerable question records the bank, year and page where the answer is, ch
 
 | Experiment | Chunking | Search | Rerank | Auto filter | Bank split | Hit@k | MRR | Recall@k | Avg retrieval (ms) |
 |---|---|---|---|---|---|---|---|---|---|
-| bm25_fixed | fixed | bm25 | no | yes | no | 87% | 0.69 | 68% | 8 |
-| dense_fixed | fixed | dense | no | yes | no | 80% | 0.54 | 49% | 37 |
-| dense_structured | structured | dense | no | yes | no | 87% | 0.60 | 56% | 17 |
+| bm25_fixed | fixed | bm25 | no | yes | no | 93% | 0.70 | 69% | 8 |
+| dense_fixed | fixed | dense | no | yes | no | 80% | 0.54 | 49% | 39 |
+| dense_structured | structured | dense | no | yes | no | 87% | 0.60 | 55% | 16 |
 | hybrid_structured | structured | hybrid | no | yes | no | 87% | 0.62 | 62% | 26 |
 | hybrid_rerank | structured | hybrid | yes | yes | no | 93% | 0.72 | 68% | 499 |
-| hybrid_rerank_nofilter | structured | hybrid | yes | no | no | 93% | 0.65 | 66% | 482 |
-| hybrid_rerank_split | structured | hybrid | yes | yes | yes | 93% | 0.72 | 68% | 538 |
+| hybrid_rerank_nofilter | structured | hybrid | yes | no | no | 93% | 0.65 | 66% | 481 |
+| hybrid_rerank_split | structured | hybrid | yes | yes | yes | 100% | 0.78 | 69% | 541 |
 
 **Answers**
 
 | Experiment | LLM | Correct refusals | False refusals | Number match | Citation valid | Cites right page | Avg generation (s) |
 |---|---|---|---|---|---|---|---|
-| bm25_fixed | ollama: qwen2.5:3b | 100% | 13% | 58% | 100% | 73% | 1.09 |
-| dense_fixed | ollama: qwen2.5:3b | 100% | 20% | 50% | 100% | 47% | 1.12 |
-| dense_structured | ollama: qwen2.5:3b | 100% | 27% | 46% | 100% | 47% | 0.89 |
+| bm25_fixed | ollama: qwen2.5:3b | 100% | 13% | 58% | 100% | 73% | 1.08 |
+| dense_fixed | ollama: qwen2.5:3b | 100% | 20% | 50% | 100% | 47% | 1.13 |
+| dense_structured | ollama: qwen2.5:3b | 100% | 27% | 46% | 100% | 47% | 0.88 |
 | hybrid_structured | ollama: qwen2.5:3b | 83% | 13% | 55% | 100% | 60% | 0.87 |
-| hybrid_rerank | ollama: qwen2.5:3b | 83% | 13% | 68% | 100% | 73% | 0.87 |
+| hybrid_rerank | ollama: qwen2.5:3b | 83% | 13% | 68% | 100% | 73% | 0.86 |
 | hybrid_rerank_nofilter | ollama: qwen2.5:3b | 83% | 7% | 67% | 100% | 67% | 0.74 |
-| hybrid_rerank_split | ollama: qwen2.5:3b | 83% | 7% | 68% | 100% | 73% | 0.69 |
+| hybrid_rerank_split | ollama: qwen2.5:3b | 83% | 7% | 68% | 100% | 80% | 0.69 |
 
-The reranker made the biggest difference: hybrid search with reranking had the best retrieval (93% Hit@5, 0.72 MRR) and the best number match (68%), for about half a second of extra retrieval time per question, and switching off bank and year filtering cost it 0.07 MRR. Plain BM25 was a surprisingly strong baseline, tying on citing the right page (73%) and refusing all six unanswerable questions, while dense search alone was the weakest at finding the exact page. Searching each bank separately (`hybrid_rerank_split`) only changes questions that name two or more banks, which is just the one cross-bank comparison question here. Without the split, its five sources were four OCBC pages and one UOB page and the model refused; with it, the sources were two pages from each of DBS, OCBC and UOB and the model named DBS as the highest. It still quoted DBS's profit before tax (SGD 13.1 billion) instead of its net profit (SGD 11.0 billion), and none of the retrieved pages is a recorded evidence page, so the retrieval scores didn't move and the drop in false refusals from 13% to 7% is that single question. Most remaining failures come from the small local model rather than retrieval: it refused the OCBC net interest margin question even though the right page was retrieved, and recommended a credit card it should have refused.
+The reranker made the biggest difference among the general changes: hybrid search with reranking had the best number match (68%) and, without the bank split, the best retrieval (93% Hit@5, 0.72 MRR), for about half a second of extra retrieval time per question, and switching off bank and year filtering cost it 0.07 MRR. Plain BM25 was a surprisingly strong baseline, tying on Hit@5 (93%) and citing the right page (73%) and refusing all six unanswerable questions, while dense search alone was the weakest at finding the exact page. Searching each bank separately (`hybrid_rerank_split`) only changes questions that name two or more banks, which is just the one cross-bank comparison question here, so all of its gains over `hybrid_rerank` come from that question. Without the split, its five sources were four OCBC pages and one UOB page and the model refused; with it, the sources were two pages from each of DBS, OCBC and UOB, the top one was DBS page 9 (an evidence page), and the model named DBS as the highest and cited that page. That is what lifts Hit@5 to 100%, MRR to 0.78, citing the right page to 80% and lowers false refusals to 7%. The answer still quoted DBS's profit before tax (SGD 13.1 billion) instead of its net profit (SGD 11.0 billion), which sits in the same paragraph, and no OCBC or UOB evidence page was retrieved, so recall for that question is only one of four pages. Most remaining failures come from the small local model rather than retrieval: it refused the OCBC net interest margin question even though the right page was retrieved, and recommended a credit card it should have refused.
 
 ## Setup (Windows)
 
