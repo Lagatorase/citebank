@@ -42,4 +42,4 @@ def test_shipped_question_files_parse():
 
     assert len(load_items(ROOT / "eval" / "demo_questions.jsonl")) == 9
     real = load_items(ROOT / "eval" / "questions.jsonl", include_unverified=True)
-    assert len(real) == 21 and all(i.type in {"numeric", "factual", "comparison", "unanswerable"} for i in real)
+    assert len(real) == 32 and all(i.type in {"numeric", "factual", "comparison", "unanswerable"} for i in real)
