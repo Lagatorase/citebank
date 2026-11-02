@@ -6,6 +6,11 @@ Ask questions about the DBS, OCBC and UOB annual reports and get short answers t
 
 The main part of this project is the evaluation suite. Every retrieval choice (chunking, search method, reranking, bank and year filtering) is measured against a question set checked against the PDFs, so I can show which choices actually improved results and by how much.
 
+**Results at a glance** (32 questions over six annual reports)
+- Cross-encoder reranking raised MRR from 0.69 to 0.82 and Hit@5 from 88% to 96%.
+- Searching each bank separately reached 100% Hit@5 and 0.86 MRR.
+- 100% of citations pointed to a source the model was actually given.
+
 ![CiteBank answering "What was DBS's net profit for 2025?" with a cited page](docs/screenshot.png)
 
 ![Clicking a sidebar question, waiting for the answer, and reading the cited source](docs/demo.gif)
