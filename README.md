@@ -138,7 +138,7 @@ Each answerable question records the bank, year and every page where the answer 
 
 With 26 answerable questions each question is worth about 4 percentage points, so a one-question difference between experiments is noise. The full analysis (hand-written vs drafted questions, what the bank split changed, and the remaining failures) is in [`eval/results/sample_report.md`](eval/results/sample_report.md).
 
-## Setup (Windows)
+## Setup
 
 You need Python 3.11 or newer, an NVIDIA GPU with current drivers (optional, but embedding is much faster with it), and [Ollama](https://ollama.com) for the local LLM.
 
@@ -153,6 +153,22 @@ pip install torch --index-url https://download.pytorch.org/whl/cu124
 pip install -r requirements.txt
 
 copy .env.example .env
+ollama pull qwen2.5:7b
+```
+
+On macOS or Linux (I haven't tested these commands):
+
+```bash
+git clone https://github.com/Lagatorase/citebank
+cd citebank
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Linux with an NVIDIA GPU: the same CUDA torch command as above. macOS: plain pip install torch
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+pip install -r requirements.txt
+
+cp .env.example .env
 ollama pull qwen2.5:7b
 ```
 
