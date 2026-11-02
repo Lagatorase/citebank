@@ -1,6 +1,12 @@
 # CiteBank
 
 [![tests](https://github.com/Lagatorase/citebank/actions/workflows/tests.yml/badge.svg)](https://github.com/Lagatorase/citebank/actions/workflows/tests.yml)
+[![License: MIT](https://img.shields.io/github/license/Lagatorase/citebank)](LICENSE)
+![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-local%20LLM-000000?logo=ollama&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-demo-FF4B4B?logo=streamlit&logoColor=white)
+![RAG](https://img.shields.io/badge/RAG-hybrid%20search%20%2B%20rerank-6E40C9)
 
 Ask questions about the DBS, OCBC and UOB annual reports and get short answers that cite the exact page they came from. If the reports don't contain the answer, it says so instead of guessing.
 
